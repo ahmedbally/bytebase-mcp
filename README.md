@@ -88,16 +88,15 @@ node test/mcp-e2e.mjs                            # full stdio protocol test (nee
 
 ## Releasing
 
-CI runs on every push and PR (typecheck → build → tests). Publishing is tag-driven:
+CI runs on every push and PR (typecheck → build → tests). Publishing is **GitHub-Release-driven**:
 
 ```bash
-# 1. Bump "version" in package.json and commit
-# 2. Tag with the same version and push:
-git tag v0.2.1 && git push origin v0.2.1
+# 1. Bump "version" in package.json, commit and push to main
+# 2. Create a GitHub Release (web UI, or):
+gh release create v0.2.1 --generate-notes --repo ahmedbally/bytebase-mcp
 ```
 
-The workflow verifies the tag matches `package.json`, publishes to npm using the
-`NPM_TOKEN` secret, and creates the GitHub Release with generated notes.
+On publish, the workflow verifies the release tag matches `package.json`, runs the full verification, publishes to npm (via the `NPM_TOKEN` secret), and appends the published version to the release notes.
 
 ## License
 
