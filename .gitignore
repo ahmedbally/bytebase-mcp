@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.log
+# OAuth grant: access + refresh tokens, live session material
+token.json
+token.json.tmp
+token.lock.dir/
+*.bak

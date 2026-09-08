@@ -1,0 +1,58 @@
+{
+  "name": "bytebase-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for Bytebase — SQL Editor, schema catalog and change plans over the Connect-RPC API, with OAuth 2.1 (PKCE) and a multi-process-safe rotating refresh token.",
+  "type": "module",
+  "bin": {
+    "bytebase-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+        "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "probe": "node dist/probe.js",
+    "auth": "node dist/auth.js",
+    "auth:status": "node dist/auth.js --status",
+    "auth:login": "node dist/auth.js --login",
+    "auth:logout": "node dist/auth.js --logout",
+    "test": "node test/logic.test.mjs && node test/oauth.test.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "bytebase",
+    "database",
+    "sql",
+    "oauth2",
+    "schema-management",
+    "database-migration"
+  ],
+  "author": "Ahmed Bally",
+  "license": "MIT",
+  "homepage": "https://github.com/ahmedbally/bytebase-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahmedbally/bytebase-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ahmedbally/bytebase-mcp/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "undici": "^7.29.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  }
+}
