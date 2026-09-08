@@ -86,6 +86,19 @@ npm run probe                                    # live preflight against .env
 node test/mcp-e2e.mjs                            # full stdio protocol test (needs auth)
 ```
 
+## Releasing
+
+CI runs on every push and PR (typecheck → build → tests). Publishing is tag-driven:
+
+```bash
+# 1. Bump "version" in package.json and commit
+# 2. Tag with the same version and push:
+git tag v0.2.1 && git push origin v0.2.1
+```
+
+The workflow verifies the tag matches `package.json`, publishes to npm using the
+`NPM_TOKEN` secret, and creates the GitHub Release with generated notes.
+
 ## License
 
 MIT
