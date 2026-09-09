@@ -1,6 +1,6 @@
 {
   "name": "bytebase-mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "MCP server for Bytebase — SQL Editor, schema catalog and change plans over the Connect-RPC API, with OAuth 2.1 (PKCE) and a multi-process-safe rotating refresh token.",
   "type": "module",
   "bin": {
