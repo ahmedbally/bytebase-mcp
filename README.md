@@ -88,7 +88,7 @@ node test/mcp-e2e.mjs                            # full stdio protocol test (nee
 
 ## Releasing
 
-CI runs on every push and PR (typecheck → build → tests). Publishing is **GitHub-Release-driven**:
+CI runs on every push and PR (typecheck → build → tests). Publishing is **GitHub-Release-driven** and uses **npm Trusted Publishers** (OIDC — no token secret in CI):
 
 ```bash
 # 1. Bump "version" in package.json, commit and push to main
@@ -96,7 +96,9 @@ CI runs on every push and PR (typecheck → build → tests). Publishing is **Gi
 gh release create v0.2.1 --generate-notes --repo ahmedbally/bytebase-mcp
 ```
 
-On publish, the workflow verifies the release tag matches `package.json`, runs the full verification, publishes to npm (via the `NPM_TOKEN` secret), and appends the published version to the release notes.
+On publish, the workflow verifies the release tag matches `package.json`, runs the full verification, publishes to npm with a provenance attestation, and appends the published version to the release notes.
+
+**One-time setup** (repo owner): on npmjs.com → `bytebase-mcp` → Settings → *Trusted Publisher*, add `ahmedbally/bytebase-mcp` with workflow `publish.yml` (no environment). Until that's configured, release publishing will fail with 403.
 
 ## License
 

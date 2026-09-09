@@ -2,6 +2,9 @@ name: Publish
 
 # CI runs on every push to main and on PRs.
 # Release: create a GitHub Release (with a vX.Y.Z tag) to publish to npm.
+# Publishing uses npm Trusted Publishers (OIDC) — no NPM_TOKEN secret:
+#   1. npmjs.com → bytebase-mcp → Settings → Trusted Publisher
+#   2. Add: GitHub / ahmedbally / bytebase-mcp / publish.yml (no environment)
 # The tag MUST match package.json version; the workflow verifies it.
 on:
   push:
@@ -11,7 +14,7 @@ on:
     types: [published]
 
 permissions:
-  contents: write # read the release, create refs if needed
+  contents: write # read the release, edit release notes
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -44,20 +47,24 @@ jobs:
         run: npm test
 
   publish:
-    name: Publish to npm
+    name: Publish to npm (Trusted Publisher)
     needs: verify
     # Only release events publish; plain pushes and PRs stop at verify.
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
+    permissions:
+      # OIDC federation for npm Trusted Publishers — replaces NPM_TOKEN.
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.tag_name }}
 
+      # Node 24 bundles npm 11, which speaks the Trusted Publisher OIDC flow.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: 24
           registry-url: https://registry.npmjs.org
 
       - run: npm ci
@@ -67,22 +74,25 @@ jobs:
           PKG_VERSION="v$(node -p 'require("./package.json").version')"
           TAG_VERSION="${{ github.event.release.tag_name }}"
           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Release tag $TAG_VERSION does not match package.json version $PKG_VERSION. Bump package.json, commit, and re-tag."
+            echo "::error::Release tag $TAG_VERSION does not match package.json version $PKG_VERSION. Bump package.json, commit, and re-release."
             exit 1
           fi
 
+      # No token: npm exchanges the GitHub OIDC claim for publish rights
+      # against the Trusted Publisher configured on npmjs.com. Provenance
+      # (build attestation) is included automatically.
       - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
-      - name: Attach release notes to the GitHub Release
+      - name: Attach published version to the GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Mark the release with the published version for quick scanning.
+          VERSION="$(node -p 'require("./package.json").version')"
+          EXISTING="$(gh release view "${{ github.event.release.tag_name }}" --repo "$GITHUB_REPOSITORY" --json body --jq .body)"
           gh release edit "${{ github.event.release.tag_name }}" \
             --repo "$GITHUB_REPOSITORY" \
-            --notes "$(gh release view "${{ github.event.release.tag_name }}" --repo "$GITHUB_REPOSITORY" --json body --jq .body)
+            --notes "$EXISTING
 
-          Published \`bytebase-mcp@$(node -p 'require("./package.json").version')\` to npm. https://www.npmjs.com/package/bytebase-mcp"
+          ---
+          Published \`bytebase-mcp@${VERSION}\` to npm with provenance: https://www.npmjs.com/package/bytebase-mcp"
