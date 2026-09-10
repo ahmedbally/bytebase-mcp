@@ -53,9 +53,9 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
-      # OIDC federation for npm Trusted Publishers — replaces NPM_TOKEN.
+      # OIDC federation for npm Trusted Publishers + release-notes editing.
       id-token: write
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
