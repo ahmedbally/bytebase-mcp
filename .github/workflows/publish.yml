@@ -78,13 +78,10 @@ jobs:
             exit 1
           fi
 
-      # Publishing prefers npm Trusted Publishers (OIDC, no secret) when the
-      # NPM_TOKEN secret is absent; with NPM_TOKEN set it authenticates via
-      # the token instead. Provenance works either way (id-token: write).
+      # No token: npm exchanges the GitHub OIDC claim for publish rights
+      # against the Trusted Publisher configured on npmjs.com.
       - name: Publish to npm
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Attach published version to the GitHub Release
         env:
