@@ -56,7 +56,7 @@ const client = new BytebaseClient({
 const catalog = new Catalog(client);
 const schemas = new SchemaCache(client);
 
-const server = new McpServer({ name: 'bytebase-mcp', version: '0.2.1' });
+const server = new McpServer({ name: 'bytebase-mcp', version: '0.2.2' });
 
 type ToolResult = { content: { type: 'text'; text: string }[]; isError?: boolean };
 

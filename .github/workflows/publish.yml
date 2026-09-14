@@ -69,6 +69,11 @@ jobs:
 
       - run: npm ci
 
+      # .gitignore excludes dist/ — the tarball only contains what is built
+      # in THIS job, so build before publishing.
+      - name: Build
+        run: npm run build
+
       - name: Verify tag matches package.json version
         run: |
           PKG_VERSION="v$(node -p 'require("./package.json").version')"
